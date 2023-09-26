@@ -1,11 +1,10 @@
 {
   "name": "backendbb",
   "version": "1.0.0",
-  "type": "module",
   "description": "backend para de RestApi del proyecto BizBridger",
-  "main": "index.js",
+  "main": "server.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node-dev src/server.ts"
   },
   "author": "Arturo Pacheco",
   "license": "MIT",
@@ -23,7 +22,10 @@
     "@types/express": "^4.17.18",
     "@types/mongoose": "^5.11.97",
     "@types/morgan": "^1.9.5",
+    "@types/node": "^20.6.5",
+    "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   }
 }
