@@ -1,9 +1,10 @@
 import {Router} from 'express'
-import { signup, update } from '../controllers/auth.controller'
+import { signup, update, signin } from '../controllers/auth.controller'
 
 const router = Router()
 
+router.get('/api/signin', signin)
 router.post('/api/signup', signup)
-router.put('/api/singup', update)
+router.put('/api/signup', update)
 
 export default router

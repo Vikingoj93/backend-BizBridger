@@ -3,6 +3,10 @@ import User from '../models/users'
 import {IUser} from '../types/user'
 import {Request, Response} from 'express'
 
+export const signin = async (req:Request, res: Response) => {
+  res.json({message: "login"})
+}
+
 export const signup = async (req: Request, res: Response) => {
     try {    
         //datos para registrar un usuario
