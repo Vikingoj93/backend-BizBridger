@@ -8,8 +8,10 @@ import router from "./routes/auth.router";
 import passport from "passport";
 import "./auth/auth";
 import session from "express-session";
-import { URL_FRONTEND } from "./config";
+import { URL_FRONTEND, SESSION_SECRET } from "./config";
 import { connectDB } from "./mongoose";
+import { IUser } from "./types/user";
+import { Types } from "mongoose";
 
 // Configuracion Express
 const app = express();
@@ -30,25 +32,28 @@ app.use(
 );
 app.use(
   session({
-    secret: "secretcode",
+    secret: SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
     cookie: {
       sameSite: "none",
-      secure: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7 // One Week
-    }
-  }))
+      secure: false, // cambiar a true cuando vaya a produccion
+      maxAge: 1000 * 60 * 60 * 24 * 7, // One Week
+    },
+  })
+);
 app.use(helmet());
 app.use(morgan("dev"));
 
 // Middleware de análisis de JSON
 app.use(express.json());
 
+// Middleware de auth
+
 // Ruta para la autenticación con Google
 app.get(
   "/auth/google",
-  passport.authenticate("google", { scope: ["profile"] })
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 // Ruta de callback después de la autenticación de Google
@@ -66,20 +71,23 @@ app.get(
 
 // Ruta en el servidor para redirigir al frontend
 app.get("/redirect/frontend", async (req: Request, res: Response) => {
-  
-    res.redirect(URL_FRONTEND + "/dashboard");
-  
+  res.redirect(URL_FRONTEND + "/dashboard");
 });
 
-app.get("/", (req: Request, res: Response) => {
-  console.log(req.user);
-  res.json({ hello: "hello" });
+app.get("/", async (req: Request, res: Response) => {
+  if (!req.session.passport?.user) {
+    res.json(null);
+  }else{
+    const user = req.session.passport?.user
+    console.log(user.name)
+  res.json(user.name);
+  }
 });
 
 app.get("/getuser", async (req: Request, res: Response) => {
   if (req.user) {
     const userId: any = req.user;
-  res.json(userId);
+    res.json(userId);
   }
 });
 
@@ -88,14 +96,16 @@ app.get("/signout", async function (req, res, next) {
     req.logout(function (err) {
       if (err) {
         return next(err);
-      }else{
-        res.send("done")
+      } else {
+        res.send("done");
       }
     });
   } else {
     res.send("done");
   }
 });
+
+app.use(router);
 // Middleware de manejo de errores de validación
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof validationResult) {

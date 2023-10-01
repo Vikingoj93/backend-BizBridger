@@ -1,7 +1,13 @@
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import passport from "passport";
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, URL_CALLBACK } from "../config";
+import {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  URL_CALLBACK,
+} from "../config";
 import User from "../models/users";
+import { signUp, update } from "../libs/register.controller";
+import { IUser } from "../types/user";
 
 passport.use(
   new GoogleStrategy(
@@ -10,19 +16,61 @@ passport.use(
       clientSecret: GOOGLE_CLIENT_SECRET as string,
       callbackURL: URL_CALLBACK as string,
     },
-    function (accessToken, refreshToken, profile, cb) {
-      console.log(profile);
-      return cb(null, profile);
-    } 
+    async function (accessToken, refreshToken, profile: any, cb) {
+      try {
+        const userExist: IUser | null = await User.findOne({ email: profile._json.email });
+
+        if (!userExist) {
+          console.log("usuario no existe, obteniendo datos para enviar a al backend");
+
+          const newUser = new User({
+            name: profile.displayName,
+            email: profile._json.email,
+            image: profile._json.picture,
+            providers: [
+              {
+                providerId: profile.id,
+                provider: profile.provider,
+              },
+            ],
+          });
+
+          console.log(newUser);
+          await signUp(newUser);
+          return cb(null, newUser);
+        }
+
+        const validateProvider = userExist.providers.some(
+          (provider: any) =>
+            provider.provider === profile.provider &&
+            provider.providerId === profile.id
+        );
+
+        if (!validateProvider) {
+          userExist.providers.push({
+            providerId: profile.id,
+            provider: profile.provider,
+          });
+
+          await update(userExist);
+          return cb(null, userExist);
+        }
+
+        console.log("inicio de sesión exitoso");
+        return cb(null, userExist);
+      } catch (error) {
+        return cb(null);
+      }     
+    }
   )
 );
 
-passport.serializeUser(function (user: any, done) {
+passport.serializeUser((user: any, done) => {
   done(null, user);
 });
 
-passport.deserializeUser(function (user: any, done) {
+passport.deserializeUser(function (user: any, done: any) {
   // Busca al usuario en tu base de datos utilizando el id y devuelve el usuario
-  
-    done(null, user);
+  //const usuario = User.findOne({email: email})
+  done(null, user)
 });
