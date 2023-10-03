@@ -9,9 +9,8 @@ import passport from "passport";
 import "./auth/auth";
 import session from "express-session";
 import { URL_FRONTEND, SESSION_SECRET } from "./config";
-import { connectDB } from "./mongoose";
-import { IUser } from "./types/user";
-import { Types } from "mongoose";
+import { IUser, IUserMongodb } from "./types/user";
+import {isAuthenticated} from './middlewares/isAuthenticated'  
 
 // Configuracion Express
 const app = express();
@@ -62,8 +61,8 @@ app.get(
   passport.authenticate("google", { failureRedirect: "/login", session: true }),
   function (req: Request, res: Response) {
     // Redirige primero a una ruta en el servidor
-    if (req.user) {
-      // Redirige al servidor "/redirect/frontend" con el "code"
+    const user = req.user as IUserMongodb
+    if (user as IUserMongodb) {
       res.redirect("/redirect/frontend");
     }
   }
@@ -71,41 +70,32 @@ app.get(
 
 // Ruta en el servidor para redirigir al frontend
 app.get("/redirect/frontend", async (req: Request, res: Response) => {
-  res.redirect(URL_FRONTEND + "/dashboard");
+    res.redirect(URL_FRONTEND + "/dashboard");
 });
 
-app.get("/", async (req: Request, res: Response) => {
-  if (!req.session.passport?.user) {
-    res.json(null);
+app.get('/', (req: Request, res: Response)=>{
+  if (req.isAuthenticated()) {
+    res.send('autenticated')
   }else{
-    const user = req.session.passport?.user
-    console.log(user.name)
-  res.json(user.name);
+    res.send('unAuthenticated')
   }
 });
 
-app.get("/getuser", async (req: Request, res: Response) => {
+app.get('/logout', (req: Request, res: Response, next: NextFunction)=>{
   if (req.user) {
-    const userId: any = req.user;
-    res.json(userId);
-  }
-});
-
-app.get("/signout", async function (req, res, next) {
-  if (req.user) {
-    req.logout(function (err) {
+    req.logOut((err)=>{
       if (err) {
-        return next(err);
-      } else {
-        res.send("done");
+        return next(err)
+      }else{
+        res.json('done')
       }
-    });
-  } else {
-    res.send("done");
+    })
   }
-});
+})
 
-app.use(router);
+app.use('/api', isAuthenticated, router);
+
+
 // Middleware de manejo de errores de validación
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof validationResult) {

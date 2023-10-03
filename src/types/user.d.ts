@@ -11,15 +11,17 @@ export interface IUser {
       providerId: string;
   }
 
-  interface PassportExtension {
-    passport: {
-      // Define aquí las propiedades que quieras agregar a passport
-      user: IUser; // Supongo que IUser es una interfaz existente
-      // Otras propiedades relacionadas con passport
-    };
-  }
-  
-  // nuevo módulo en TypeScript para extender req.session
-  declare module 'express-session' {
-    interface SessionData extends PassportExtension {}
-  }
+export interface IUserMongodb {
+  _id: string,
+  name: string,
+  email: string,
+  image: string,
+  providers: [
+    {
+      provider: string,
+      providerId: string,
+      _id: string
+    }
+  ],
+  __v: number
+}

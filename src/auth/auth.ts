@@ -7,7 +7,7 @@ import {
 } from "../config";
 import User from "../models/users";
 import { signUp, update } from "../libs/register.controller";
-import { IUser } from "../types/user";
+import { IUser} from "../types/user";
 
 passport.use(
   new GoogleStrategy(
@@ -66,11 +66,16 @@ passport.use(
 );
 
 passport.serializeUser((user: any, done) => {
-  done(null, user);
+  // Serializar al usuario, por ejemplo, usando su ID o email
+  done(null, user._id); // Usando el email como ejemplo, puedes adaptarlo según tus necesidades
 });
 
-passport.deserializeUser(function (user: any, done: any) {
-  // Busca al usuario en tu base de datos utilizando el id y devuelve el usuario
-  //const usuario = User.findOne({email: email})
-  done(null, user)
-});
+passport.deserializeUser( async (id: string, done) => {
+  // Deserializar al usuario usando el email (o el ID) y buscarlo en tu base de datos
+  const userId = await User.findOne({ _id: id }) 
+
+  if (userId) {
+    return done(null, userId);
+  }
+    return done(new Error('Usuario no encontrado'), null);
+  });

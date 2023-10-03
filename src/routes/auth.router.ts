@@ -1,11 +1,9 @@
 import {Router} from 'express'
-import {profile, tasks} from '../controllers/auth.controller'
-import { ensureAuthenticated } from '../middlewares/userAutenticated'
+import { profile, tasks} from '../controllers/auth.controller'
 
 const router = Router()
 
-router.use(ensureAuthenticated)
-router.get('/api/dashboard/profile', profile)
-router.post('/api/dashboard/tasks', tasks)
+router.get('/dashboard/profile', profile)
+router.post('/dashboard/profile/tasks', tasks)
 
-export default router
+export default router;
