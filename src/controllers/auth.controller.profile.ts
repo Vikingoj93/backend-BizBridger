@@ -14,4 +14,3 @@ export function profile(req: Request, res: Response) {
   }
 }
 
-export function tasks(req: Request, res: Response) {}

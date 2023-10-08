@@ -1,5 +1,5 @@
 import{ Schema, model, models} from 'mongoose';
-import {IAuthProviders, IUser} from '../types/user'
+import {IUser} from '../types/user'
 
 const providersSchema: Schema = new Schema({
     provider: String,

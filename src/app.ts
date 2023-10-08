@@ -3,13 +3,12 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import { validationResult } from "express-validator";
 import router from "./routes/auth.router";
 import passport from "passport";
 import "./auth/auth";
 import session from "express-session";
 import { URL_FRONTEND, SESSION_SECRET } from "./config";
-import { IUser, IUserMongodb } from "./types/user";
+import { IUserMongodb } from "./types/user";
 import {isAuthenticated} from './middlewares/isAuthenticated'  
 
 // Configuracion Express
@@ -93,16 +92,7 @@ app.get('/logout', (req: Request, res: Response, next: NextFunction)=>{
   }
 })
 
-app.use('/api', isAuthenticated, router);
-
-
-// Middleware de manejo de errores de validación
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (err instanceof validationResult) {
-    return res.status(422).json({ errores: err.message });
-  }
-  next(err);
-});
+app.use('/api'/*, isAuthenticated*/, router);
 
 // Middleware de manejo de errores genéricos
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

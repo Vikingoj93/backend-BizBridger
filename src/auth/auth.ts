@@ -66,8 +66,7 @@ passport.use(
 );
 
 passport.serializeUser((user: any, done) => {
-  // Serializar al usuario, por ejemplo, usando su ID o email
-  done(null, user._id); // Usando el email como ejemplo, puedes adaptarlo según tus necesidades
+  done(null, user._id); 
 });
 
 passport.deserializeUser( async (id: string, done) => {

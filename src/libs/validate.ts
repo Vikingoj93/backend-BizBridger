@@ -1,18 +1,7 @@
-import {IUser} from '../types/user'
+import { IUser } from "../types/user";
+import { Request, Response } from "express";
 
-export function validateRes(res:any) {
-    if (res.status === 200) {
-      return true;
-    } else {
-      console.error(
-        "Error en la solicitud:",
-        res.status,
-        res.statusText
-      )
-      return false;
-    }
-  }
-
+// validaciones de usuario
 export const validateUserData = (data: IUser): boolean => {
   if (!data.email || !data.name) {
     return false;
@@ -24,4 +13,23 @@ export const validateUserData = (data: IUser): boolean => {
     }
   }
   return true;
+};
+
+// validaciones de controller diary
+
+// Validar el formato de fecha ("YYYY-MM-DD")
+export const validateDate = (dataDate: string) => {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  return dateRegex.test(dataDate);
+};
+
+// Validar el formato de la hora (HH:MM)
+export const validateTime = (dataDate: string, currentDate: string, dataTime: string, dataRequired: boolean) => {
+  const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+  if(dataDate === currentDate) {
+    if (dataTime && dataRequired) {
+      timeRegex.test(dataTime)
+    }
+  }
+  
 };
