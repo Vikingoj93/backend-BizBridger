@@ -55,18 +55,26 @@ export async function events(req: Request, res: Response) {
 
     if (newEvent) {
       await newEvent.save();
-      res.json({ message: "Su evento se registro con exito!!" });
+      return res.json({ message: "Su evento se registro con exito!!" });
     }
 
-    res
+    return res
       .status(400)
       .json({ message: "Error al momento de registrar el evento" });
   } catch (error) {
     if (error instanceof Error) {
-      res.json({ message: error });
+     return res.json({ message: error });
     }
-    console.log(error);
+    return console.log(error);
   }
+}
+
+export async function getEvents(req: Request, res: Response) {
+  const user = req.user as IUserMongodb;
+  const userId = user._id;
+
+  const events = await Event.find({ userId });
+  return res.json(events);
 }
 export function tasks(req: Request, res: Response) {}
 export function notes(req: Request, res: Response) {}
