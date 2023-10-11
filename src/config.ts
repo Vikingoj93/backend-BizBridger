@@ -16,3 +16,7 @@ export const SESSION_SECRET = process.env.SESSION_SECRET || 'secretcode'
 export const API_KEY = process.env.API_KEY || 'mi_clave_secreta_dev';
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || undefined
 export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || undefined
+
+
+export const date = new Date().toISOString().slice(0,10)
+export const hours = new Date().toISOString().slice(11,16)

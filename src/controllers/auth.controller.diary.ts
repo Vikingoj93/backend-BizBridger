@@ -3,6 +3,7 @@ import { Event } from "../models/diary";
 import { IEvent } from "../types/diary";
 import { IUserMongodb } from "../types/user";
 import { validateDate } from "../libs/validate";
+import { date, hours } from "../config";
 
 export async function events(req: Request, res: Response) {
   try {
@@ -29,18 +30,18 @@ export async function events(req: Request, res: Response) {
       }
     }
 
-    const currentDate = new Date(); // Obtener la fecha y hora actual
+    const currentDate = date; // Obtener la fecha y hora actual
 
     // Validar la fecha
-    if (body.Date < currentDate.toISOString().slice(0, 10)) {
+    if (body.Date < currentDate) {
       return res.status(400).json({
         error: "La fecha del evento debe ser superior a la fecha actual",
       });
     }
 
     // Si la fecha es el día actual, validar la hora
-    if (body.Date === currentDate.toISOString().slice(0, 10)) {
-      const currentTime = currentDate.toISOString().slice(11, 16); // Obtener la hora actual en formato HH:MM
+    if (body.Date === currentDate) {
+      const currentTime = hours; // Obtener la hora actual en formato HH:MM
       if (body.Time && body.Time < currentTime) {
         return res.status(400).json({
           error: "La hora del evento debe ser superior a la hora actual",
@@ -63,7 +64,7 @@ export async function events(req: Request, res: Response) {
       .json({ message: "Error al momento de registrar el evento" });
   } catch (error) {
     if (error instanceof Error) {
-     return res.json({ message: error });
+      return res.json({ message: error });
     }
     return console.log(error);
   }
@@ -76,5 +77,51 @@ export async function getEvents(req: Request, res: Response) {
   const events = await Event.find({ userId });
   return res.json(events);
 }
+
+export async function updateEvent(req: Request, res: Response) {
+  const user = req.user as IUserMongodb;
+  const userId = req.query.user;
+  const eventId = req.query.event;
+  const data: IEvent = req.body;
+  console.log(data)
+  if (user) {
+    try {
+      if (user._id.toString() === userId) {
+        const updateEvent = await Event.findByIdAndUpdate(
+          { _id: eventId, userId: userId },
+          {$set: { title: data.title,
+            description: data.description,
+            Date: data.Date,
+            required: data.required,
+            Time: data.Time,
+            category: data.category
+
+           }},
+          { new: true }
+        );
+
+        if (updateEvent) {
+          console.log(updateEvent)
+          return res.json({ message: "Evento actualizado exitosamente" });
+        } else {
+          return res
+            .status(400)
+            .json({ error: "Error al actualizar el evento" });
+        }
+      } else {
+        return res
+          .status(400)
+          .json({
+            error: "Esta intentando actualizar un evento que no le pertenece",
+          });
+      }
+    } catch (error) {
+      return console.log(error);
+    }
+  } else {
+    return res.status(400).json({ error: "Erorr al actualizar el evento" });
+  }
+}
+
 export function tasks(req: Request, res: Response) {}
 export function notes(req: Request, res: Response) {}
