@@ -83,25 +83,27 @@ export async function updateEvent(req: Request, res: Response) {
   const userId = req.query.user;
   const eventId = req.query.event;
   const data: IEvent = req.body;
-  console.log(data)
+  console.log(data);
   if (user) {
     try {
       if (user._id.toString() === userId) {
         const updateEvent = await Event.findByIdAndUpdate(
           { _id: eventId, userId: userId },
-          {$set: { title: data.title,
-            description: data.description,
-            Date: data.Date,
-            required: data.required,
-            Time: data.Time,
-            category: data.category
-
-           }},
+          {
+            $set: {
+              title: data.title,
+              description: data.description,
+              Date: data.Date,
+              required: data.required,
+              Time: data.Time,
+              category: data.category,
+            },
+          },
           { new: true }
         );
 
         if (updateEvent) {
-          console.log(updateEvent)
+          console.log(updateEvent);
           return res.json({ message: "Evento actualizado exitosamente" });
         } else {
           return res
@@ -109,17 +111,39 @@ export async function updateEvent(req: Request, res: Response) {
             .json({ error: "Error al actualizar el evento" });
         }
       } else {
-        return res
-          .status(400)
-          .json({
-            error: "Esta intentando actualizar un evento que no le pertenece",
-          });
+        return res.status(400).json({
+          error: "Esta intentando actualizar un evento que no le pertenece",
+        });
       }
     } catch (error) {
       return console.log(error);
     }
   } else {
     return res.status(400).json({ error: "Erorr al actualizar el evento" });
+  }
+}
+
+export async function eventDelete(req: Request, res: Response) {
+  const userId = req.query.user;
+  const eventId = req.query.event;
+  const user = req.user as IUserMongodb
+  console.log(user?._id.toString())
+  console.log(userId)
+  if (user) {
+    try {
+      if (user?._id.toString() === userId) {
+        const eventDeleted = await Event.findByIdAndDelete({_id: eventId, userId: userId });
+        if (eventDeleted) {
+          return res.json({ message: "Evento eliminado1" });
+        } else {
+          return res.status(400).json({ error: "error al eliminar evento2" });
+        }
+      } else {
+        return res.status(400).json({ error: "error al eliminar evento3" });
+      }
+    } catch (error) {
+      return res.status(400).json({ error: "error al eliminar evento4" });
+    }
   }
 }
 
