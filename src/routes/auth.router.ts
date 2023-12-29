@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { profile } from "../controllers/auth.controller.profile";
-import { events, tasks, notes, getEvents, updateEvent, eventDelete } from "../controllers/auth.controller.diary";
+import { events, getEvents, updateEvent, eventDelete } from "../controllers/auth.controller.diaryEvents";
+import { tasks } from "../controllers/auth.controller.diaryTasks";
+import { notes } from "../controllers/auth.controller.diaryNotes";
 
 const router = Router();
 
