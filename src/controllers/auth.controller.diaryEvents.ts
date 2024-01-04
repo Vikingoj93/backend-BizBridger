@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Event } from "../models/diary";
+import { Event } from "../models/personal/agenda/diary";
 import { IEvent } from "../types/diary";
 import { IUserMongodb } from "../types/user";
 import { validateDate } from "../libs/validate";

@@ -1,5 +1,5 @@
 import { Schema, model, models } from "mongoose";
-import { IEvent } from "../types/diary";
+import { IEvent } from "../../../types/diary";
 
 const eventSchema = new Schema({
   userId: {
