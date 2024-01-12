@@ -92,7 +92,7 @@ app.get('/logout', (req: Request, res: Response, next: NextFunction)=>{
   }
 })
 
-app.use('/api'/*, isAuthenticated*/, router);
+app.use('/api', isAuthenticated, router);
 
 // Middleware de manejo de errores genéricos
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

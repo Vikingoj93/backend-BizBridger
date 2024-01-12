@@ -1,4 +1,4 @@
-import {Schema} from 'mongoose'
+import { Schema } from "mongoose";
 
 export interface IEvent {
   title: string;
@@ -6,5 +6,12 @@ export interface IEvent {
   Date: string;
   required: boolean;
   Time: string;
+  category: string;
+}
+export interface ITask {
+  title: string;
+  description: string;
+  Date: string;
+  required: boolean;
   category: string;
 }

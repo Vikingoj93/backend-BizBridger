@@ -5,11 +5,22 @@ import { IUserMongodb } from "../types/user";
 import { validateDate } from "../libs/validate";
 import { date, hours } from "../config";
 
-export async function events(req: Request, res: Response) {
+
+export async function getEvents(req: Request, res: Response) {
+  const user = req.user as IUserMongodb;
+  const userId = user._id;
+
+  const events = await Event.find({ userId });
+  return res.json(events);
+}
+
+export async function postEvents(req: Request, res: Response) {
   try {
     const user = req.user as IUserMongodb;
     const body: IEvent = await req.body;
 
+    console.log(body)
+    // Validar que los datos del frontend tienen un formato valido
     if (
       body.title.length > 40 ||
       body.description.length > 250 ||
@@ -70,13 +81,6 @@ export async function events(req: Request, res: Response) {
   }
 }
 
-export async function getEvents(req: Request, res: Response) {
-  const user = req.user as IUserMongodb;
-  const userId = user._id;
-
-  const events = await Event.find({ userId });
-  return res.json(events);
-}
 
 export async function updateEvent(req: Request, res: Response) {
   const user = req.user as IUserMongodb;
@@ -127,8 +131,6 @@ export async function eventDelete(req: Request, res: Response) {
   const userId = req.query.user;
   const eventId = req.query.event;
   const user = req.user as IUserMongodb;
-  console.log(user?._id.toString());
-  console.log(userId);
   if (user) {
     try {
       if (user?._id.toString() === userId) {
