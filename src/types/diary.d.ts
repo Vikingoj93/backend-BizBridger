@@ -15,3 +15,8 @@ export interface ITask {
   required: boolean;
   category: string;
 }
+export interface INotes {
+  description: string;
+  category: string;
+  Date: String
+}

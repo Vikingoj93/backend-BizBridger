@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { IUserMongodb } from "../types/user";
 import { Task } from "../models/personal/agenda/task";
-import { IEvent, ITask } from "../types/diary";
+import { ITask } from "../types/diary";
 import { validateDate } from "../libs/validate";
 import { date } from "../config";
 
@@ -55,7 +55,7 @@ export async function postTasks(req: Request, res: Response) {
 
     return res
       .status(400)
-      .json({ message: "Error al momento de registrar el tarea" });
+      .json({ message: "Error al momento de registrar la tarea" });
   } catch (error) {
     if (error instanceof Error) {
       return res.json({ message: error });
@@ -68,7 +68,7 @@ export async function updateTasks(req:Request, res: Response) {
   const user = req.user as IUserMongodb
   const userId = req.query.user
   const taskId = req.query.task
-  const data : IEvent = req.body
+  const data : ITask = req.body
 
   if (user) {
     try {
@@ -115,11 +115,11 @@ export async function taskDelete(req: Request, res: Response) {
   if (user) {
     try {
       if (user?._id.toString() === userId) {
-        const eventDeleted = await Task.findByIdAndDelete({
+        const taskDeleted = await Task.findByIdAndDelete({
           _id: taskId,
           userId: userId,
         });
-        if (eventDeleted) {
+        if (taskDeleted) {
           return res.json({ message: "Tarea eliminada" });
         } else {
           return res.status(400).json({ error: "error al eliminar tarea" });
